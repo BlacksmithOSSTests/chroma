@@ -7,7 +7,7 @@ jobs:
   test:
     strategy:
       matrix:
-        platform: [depot-ubuntu-22.04]
+        platform: [blacksmith-4vcpu-ubuntu-2204]
     runs-on: ${{ matrix.platform }}
     env:
       CARGO_TERM_COLOR: always
@@ -35,7 +35,7 @@ jobs:
   test-integration:
     strategy:
       matrix:
-        platform: [depot-ubuntu-22.04-16]
+        platform: [blacksmith-4vcpu-ubuntu-2204]
     runs-on: ${{ matrix.platform }}
     # OIDC token auth for Depot & AWS
     permissions:
@@ -74,7 +74,7 @@ jobs:
   test-benches:
     strategy:
       matrix:
-        platform: [depot-ubuntu-22.04-16]
+        platform: [blacksmith-4vcpu-ubuntu-2204]
         bench-command:
           - "--bench blockfile_writer -- --sample-size 10"
           - "--bench distance_metrics"
@@ -97,7 +97,7 @@ jobs:
         run: cargo bench ${{ matrix.bench-command }}
 
   can-build-release:
-    runs-on: depot-ubuntu-22.04-16
+    runs-on: blacksmith-4vcpu-ubuntu-2204
     env:
       CARGO_TERM_COLOR: always
     steps:

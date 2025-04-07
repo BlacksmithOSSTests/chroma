@@ -106,7 +106,7 @@ jobs:
           if-no-files-found: error
   publish:
     name: Publish
-    runs-on: ubuntu-latest
+    runs-on: blacksmith-4vcpu-ubuntu-2204
     defaults:
       run:
         working-directory: rust/js_bindings
@@ -115,7 +115,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - name: Setup node
-        uses: actions/setup-node@v4
+        uses: useblacksmith/setup-node@v5
         with:
           node-version: 20
           cache: yarn
