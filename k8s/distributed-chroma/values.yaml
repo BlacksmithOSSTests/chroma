@@ -5,7 +5,7 @@ namespace: 'chroma'
 
 frontendService:
   image:
-    repository: 'frontend-service'
+    repository: 'blacksmithcihello/frontend-service'
     tag: 'latest'
 
   # Sometimes users (and us) want to pass values directly as flags. Sometimes, these are
@@ -38,7 +38,7 @@ frontendService:
 
 rustFrontendService:
   image:
-    repository: 'rust-frontend-service'
+    repository: 'blacksmithcihello/rust-frontend-service'
     tag: 'latest'
   replicaCount: 1
   resources:
@@ -51,7 +51,7 @@ rustFrontendService:
 
 sysdb:
   image:
-    repository: 'sysdb'
+    repository: 'blacksmithcihello/sysdb'
     tag: 'latest'
   replicaCount: 1
   env:
@@ -69,7 +69,7 @@ sysdb:
 
 logService:
   image:
-    repository: 'logservice'
+    repository: 'blacksmithcihello/logservice'
     tag: 'latest'
   env:
   - name: OPTL_TRACING_ENDPOINT
@@ -82,12 +82,12 @@ logService:
 
 rustLogService:
   image:
-    repository: 'rust-log-service'
+    repository: 'blacksmithcihello/rust-log-service'
     tag: 'latest'
 
 queryService:
   image:
-    repository: 'query-service'
+    repository: 'blacksmithcihello/query-service'
     tag: 'latest'
   env:
   cache:
@@ -97,7 +97,7 @@ queryService:
 
 compactionService:
   image:
-    repository: 'compaction-service'
+    repository: 'blacksmithcihello/compaction-service'
     tag: 'latest'
   env:
   cache:
@@ -107,7 +107,7 @@ compactionService:
 
 sysdbMigration:
   image:
-    repository: 'sysdb-migration'
+    repository: 'blacksmithcihello/sysdb-migration'
     tag: 'latest'
   username: chroma
   password: chroma
@@ -118,7 +118,7 @@ sysdbMigration:
 
 logServiceMigration:
   image:
-    repository: 'logservice-migration'
+    repository: 'blacksmithcihello/logservice-migration'
     tag: 'latest'
   env:
   - name: CHROMA_DB_LOG_URL
@@ -127,7 +127,7 @@ logServiceMigration:
 # Add the garbage collector configuration
 garbageCollector:
   image:
-    repository: 'garbage-collector'
+    repository: 'blacksmithcihello/garbage-collector'
     tag: 'latest'
   replicaCount: 1
   resources:

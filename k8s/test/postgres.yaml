@@ -15,7 +15,7 @@ spec:
     spec:
       containers:
         - name: postgres
-          image: chroma-postgres
+          image: blacksmithcihello/chroma-postgres:latest
           env:
             - name: POSTGRES_MULTIPLE_DATABASES
               value: "sysdb,log"

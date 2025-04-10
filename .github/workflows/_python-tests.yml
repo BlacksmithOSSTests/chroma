@@ -148,12 +148,57 @@ jobs:
           ENV_FILE: ${{ matrix.env-file }}
           PROPERTY_TESTING_PRESET: ${{ inputs.property_testing_preset }}
 
+  build-cluster-images:
+    runs-on: blacksmith-4vcpu-ubuntu-2204
+    permissions:
+      contents: read
+      id-token: write
+      packages: write
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Blacksmith builder
+        uses: useblacksmith/build-push-action@setup-only
+        with:
+          setup-only: true
+
+      - name: Log in to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: blacksmithcihello
+          password: ${{ secrets.DOCKERHUB_PASSWORD }}
+
+      # Build and push all images using docker/bake-action
+      - name: Build and push Docker images
+        uses: docker/bake-action@v5
+        with:
+          files: docker-bake.hcl
+          push: true
+
+      # Extract and export image tags
+      - name: Export image tags
+        run: |
+          docker buildx bake --file docker-bake.hcl --print | \
+            jq -r '.target | to_entries[] | .value.tags[]' | \
+            grep "blacksmithcihello" > image-tags.txt
+          
+          echo "Images built and pushed:"
+          cat image-tags.txt
+
+      # Export the image repository:tag for later use
+      - name: Upload image tags file
+        uses: useblacksmith/cache/save@v5
+        with:
+          key: image-tags-${{ github.sha }}
+          path: image-tags.txt
+
   test-cluster-rust-frontend:
+    needs: build-cluster-images
     strategy:
       fail-fast: false
       matrix:
         python: ${{fromJson(inputs.python_versions)}}
-        platform: ["depot-ubuntu-22.04-4"]
+        platform: ["blacksmith-4vcpu-ubuntu-2204"]
         test-globs: ["chromadb/test/api",
                     "chromadb/test/api/test_collection.py",
                     "chromadb/test/api/test_limit_offset.py",
@@ -165,7 +210,6 @@ jobs:
                     "chromadb/test/property/test_collections_with_database_tenant_overwrite.py",
                     "chromadb/test/distributed/test_sanity.py"]
     runs-on: ${{ matrix.platform }}
-    # OIDC token auth for Depot & AWS
     permissions:
       contents: read
       id-token: write
@@ -174,15 +218,53 @@ jobs:
       - uses: ./.github/actions/python
         with:
           python-version: ${{ matrix.python }}
-      - name: Configure pytest to upload results to Datadog
-        uses: datadog/test-visibility-github-action@v2
+      - name: Log in to Docker Hub
+        uses: docker/login-action@v3
         with:
-          languages: python
-          api_key: ${{ secrets.DD_API_KEY }}
-          site: ${{ vars.DD_SITE }}
-      - uses: ./.github/actions/tilt
+          username: blacksmithcihello
+          password: ${{ secrets.DOCKERHUB_PASSWORD }}
+      # Download the image repository:tag from the build job
+      - name: Download image tags file
+        uses: useblacksmith/cache/restore@v5
         with:
-          depot-project-id: ${{ vars.DEPOT_PROJECT_ID }}
+          key: image-tags-${{ github.sha }}
+          path: image-tags.txt
+      - name: Print image tags
+        run: cat image-tags.txt
+      
+      # Pull the pre-built images
+      - name: Pull pre-built images
+        run: |
+          # Pull each image from the registry
+          while read -r image; do
+            if [[ -n "$image" ]]; then  # Skip empty lines
+              echo "Pulling image: $image"
+              docker pull "$image" || {
+                echo "Warning: Failed to pull $image, will retry once..."
+                sleep 5
+                docker pull "$image" || echo "Error: Failed to pull $image after retry"
+              }
+              
+              # Tag with local name (without registry prefix)
+              local_tag=$(echo "$image" | sed "s|blacksmithcihello\/||")
+              if [[ "$image" != "$local_tag" ]]; then
+                docker tag "$image" "$local_tag"
+                echo "Tagged $image as $local_tag"
+              fi
+            fi
+          done < image-tags.txt
+          
+          # List all available images
+          echo "Available Docker images:"
+          docker images | grep -E '(chroma|sysdb|service)'
+      
+      # Deploy with Tilt in deploy-only mode, skipping Docker builds
+      - name: Deploy with Tilt
+        uses: ./.github/actions/tilt
+        with:
+          only_deploy: true
+      
+      # Run tests
       - name: Test
         run: bin/cluster-test.sh bash -c 'python -m pytest "${{ matrix.test-globs }}"'
         shell: bash
