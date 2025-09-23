@@ -189,6 +189,9 @@ jobs:
     if: contains(fromJson(needs.change-detection.outputs.tests-to-run), 'rust')
     uses: ./.github/workflows/_rust-tests.yml
     secrets: inherit
+    permissions:
+      contents: read
+      id-token: write
 
   go-tests:
     name: Go tests
@@ -196,6 +199,9 @@ jobs:
     if: contains(fromJson(needs.change-detection.outputs.tests-to-run), 'go')
     uses: ./.github/workflows/_go-tests.yml
     secrets: inherit
+    permissions:
+      contents: read
+      id-token: write
 
   lint:
     name: Lint
