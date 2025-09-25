@@ -296,10 +296,9 @@ jobs:
           Write-Host "Current PATH: $currentPath"
 
           $newPath = $msvcBinPath + ';' + $currentPath
-          Write-Host "New PATH: $newPath"
-
           [Environment]::SetEnvironmentVariable("PATH", $newPath, "Machine")
-          Write-Host "Final PATH: [System.Environment]::GetEnvironmentVariable("PATH", "Machine")"
+          $finalPath = [System.Environment]::GetEnvironmentVariable("PATH", "Machine")
+          Write-Host "New PATH: $finalPath"
         shell: powershell
 
       - name: Build Rust bindings
