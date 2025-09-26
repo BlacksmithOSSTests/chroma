@@ -75,7 +75,9 @@ jobs:
 
   build-windows:
     name: Build Windows bindings
-    runs-on: blacksmith-8vcpu-windows-2025
+    runs-on:
+      - blacksmith-staging-8vcpu-windows-2025
+      - bs-dev-taha
     defaults:
       run:
         working-directory: rust/js_bindings
