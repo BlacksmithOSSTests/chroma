@@ -97,12 +97,9 @@ jobs:
           cache-dependency-path: rust/js_bindings/pnpm-lock.yaml
       - name: Set up Rust toolchain
         uses: actions-rs/toolchain@v1
-        continue-on-error: true
         with:
           toolchain: stable
           override: true
-      - name: Sleep for debug
-        run: sleep 1000
       - name: Install Protoc
         uses: arduino/setup-protoc@v3
         with:
