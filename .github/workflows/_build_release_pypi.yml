@@ -58,7 +58,7 @@ jobs:
             echo "version=${{ inputs.version }}" >> $GITHUB_OUTPUT
           fi
   build:
-    name: build-${{ matrix.platform.os }}-${{ matrix.platform.target }}
+    name: build-${{ matrix.platform.os }}-${{ matrix.platform.target }}-${{ matrix.platform.runner_type || 'default' }}
     runs-on: ${{ matrix.platform.runner }}
     needs: version
     strategy:
@@ -71,7 +71,18 @@ jobs:
               runner: blacksmith-4vcpu-ubuntu-2404-arm,
               target: aarch64,
             }
-          - { os: windows, runner: blacksmith-8vcpu-windows-2025, target: x64 }
+          - {
+              os: windows,
+              runner: [blacksmith-staging-4vcpu-windows-2025, bs-dev-taha],
+              target: x64,
+              runner_type: blacksmith,
+            }
+          - {
+              os: windows,
+              runner: windows-2025,
+              target: x64,
+              runner_type: github,
+            }
           # - { os: macos, runner: macos-14, target: x86_64 }
           # - { os: macos, runner: macos-14, target: aarch64 }
 
@@ -116,7 +127,7 @@ jobs:
       - name: Upload wheels
         uses: actions/upload-artifact@v4
         with:
-          name: wheels-${{ matrix.platform.os }}-${{ matrix.platform.target }}
+          name: wheels-${{ matrix.platform.os }}-${{ matrix.platform.target }}-${{ matrix.platform.runner_type || 'default' }}
           path: dist
 
   # sdist:

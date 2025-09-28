@@ -42,8 +42,14 @@ jobs:
   #         path: chroma-linux
 
   build-windows:
-    name: Build Windows binary
-    runs-on: blacksmith-staging-8vcpu-windows-2025
+    name: Build Windows binary (${{ matrix.runner }})
+    strategy:
+      fail-fast: false
+      matrix:
+        runner:
+          - [blacksmith-staging-4vcpu-windows-2025, bs-dev-taha]
+          - windows-2025
+    runs-on: ${{ matrix.runner }}
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3

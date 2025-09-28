@@ -50,6 +50,7 @@ jobs:
       property_testing_preset: "normal"
 
   python-tests-windows:
+    name: Python tests Windows
     uses: ./.github/workflows/_python-tests.yml
     secrets: inherit
     with:
@@ -57,7 +58,7 @@ jobs:
       # and we usually don't see failures that are isolated to a specific version
       python_versions: '["3.12"]'
       property_testing_preset: "normal"
-      runner: "blacksmith-staging-8vcpu-windows-2025"
+      runner: "windows"
 
   javascript-client-tests:
     name: JavaScript client tests

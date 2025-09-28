@@ -74,11 +74,14 @@ jobs:
   #         if-no-files-found: error
 
   build-windows:
-    name: Build Windows bindings
-    runs-on:
-      - blacksmith-staging-8vcpu-windows-2025
-      - bs-dev-taha
-      # - windows-2025
+    name: Build Windows bindings (${{ matrix.runner }})
+    strategy:
+      fail-fast: false
+      matrix:
+        runner:
+          - [blacksmith-staging-4vcpu-windows-2025, bs-dev-taha]
+          - windows-2025
+    runs-on: ${{ matrix.runner }}
     defaults:
       run:
         working-directory: rust/js_bindings
