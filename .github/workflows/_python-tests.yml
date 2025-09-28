@@ -264,8 +264,9 @@ jobs:
       matrix:
         python: ${{ fromJson(inputs.python_versions) }}
     runs-on:
-      - blacksmith-staging-8vcpu-windows-2025
-      - bs-dev-taha
+      # - blacksmith-staging-8vcpu-windows-2025
+      # - bs-dev-taha
+      - windows-2025
     steps:
       - name: Checkout
         uses: actions/checkout@v4
