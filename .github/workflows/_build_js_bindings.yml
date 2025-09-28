@@ -76,9 +76,9 @@ jobs:
   build-windows:
     name: Build Windows bindings
     runs-on:
-      # - blacksmith-staging-8vcpu-windows-2025
-      # - bs-dev-taha
-      - windows-2025
+      - blacksmith-staging-8vcpu-windows-2025
+      - bs-dev-taha
+      # - windows-2025
     defaults:
       run:
         working-directory: rust/js_bindings
@@ -97,9 +97,12 @@ jobs:
           cache-dependency-path: rust/js_bindings/pnpm-lock.yaml
       - name: Set up Rust toolchain
         uses: actions-rs/toolchain@v1
+        continue-on-error: true
         with:
           toolchain: stable
           override: true
+      - name: Sleep for debug
+        run: sleep 1000
       - name: Install Protoc
         uses: arduino/setup-protoc@v3
         with:
