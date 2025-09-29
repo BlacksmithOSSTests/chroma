@@ -14,30 +14,21 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
-        with:
-          fetch-depth: 1
 
-      - name: Set up Python 3.12
-        uses: actions/setup-python@v5
+      - name: Setup Python
+        uses: ./.github/actions/python
         with:
           python-version: "3.12"
 
       - name: Setup Rust
-        uses: dtolnay/rust-toolchain@stable
+        uses: ./.github/actions/rust
         with:
-          targets: x86_64-pc-windows-msvc
-
-      - name: Install dependencies
-        shell: bash
-        run: |
-          python -m pip install --upgrade pip
-          pip install -r requirements.txt
-          pip install maturin pytest
+          github-token: ${{ github.token }}
 
       - name: Build Rust bindings
-        shell: bash
-        run: |
-          maturin build --release
+        uses: PyO3/maturin-action@v1
+        with:
+          command: build
 
       - name: Install built wheel
         shell: bash
@@ -69,25 +60,31 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
-        with:
-          fetch-depth: 1
 
-      - name: Set up Python 3.12
-        uses: actions/setup-python@v5
+      - name: Setup Python
+        uses: ./.github/actions/python
         with:
           python-version: "3.12"
 
-      - name: Install dependencies
+      - name: Setup Rust
+        uses: ./.github/actions/rust
+        with:
+          github-token: ${{ github.token }}
+
+      - name: Build Rust bindings
+        uses: PyO3/maturin-action@v1
+        with:
+          command: build
+
+      - name: Install built wheel
         shell: bash
         run: |
-          python -m pip install --upgrade pip
-          pip install -e .
+          pip install --no-index --find-links target/wheels/ chromadb
 
       - name: Test CLI
         shell: bash
         run: |
-          chroma --help
-          chroma --version
+          python -m pytest "chromadb/test/test_cli.py"
 
       - name: Sleep for debugging
         if: failure()
@@ -105,40 +102,24 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
-        with:
-          fetch-depth: 1
 
-      - name: Set up Python 3.12
-        uses: actions/setup-python@v5
+      - name: Setup Python
+        uses: ./.github/actions/python
         with:
           python-version: "3.12"
 
       - name: Setup Rust
-        uses: dtolnay/rust-toolchain@stable
+        uses: ./.github/actions/rust
         with:
-          targets: x86_64-pc-windows-msvc
+          github-token: ${{ github.token }}
 
-      - name: Install dependencies
-        shell: bash
-        run: |
-          python -m pip install --upgrade pip
-          pip install -r requirements.txt
-          pip install pytest
-
-      - name: Start Chroma server
-        shell: bash
-        run: |
-          uvicorn chromadb.app:app --host 0.0.0.0 --port 8000 &
-          sleep 10
-          curl http://localhost:8000/api/v1/heartbeat || true
-
-      - name: Run thin client test
+      - name: Test
+        run: bin/rust-integration-test.sh chromadb/test/property/test_embeddings.py
         shell: bash
         env:
-          CHROMA_THIN_CLIENT_TEST_ONLY: "1"
-          RUST_BACKTRACE: 1
-        run: |
-          python -m pytest chromadb/test/test_api.py::test_heartbeat -v
+          CHROMA_THIN_CLIENT: "1"
+          ENV_FILE: compose-env.windows
+          PROPERTY_TESTING_PRESET: normal
 
       - name: Sleep for debugging
         if: failure()
