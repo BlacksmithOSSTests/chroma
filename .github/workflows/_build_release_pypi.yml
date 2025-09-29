@@ -15,7 +15,7 @@ on:
         type: boolean
   schedule:
     # Run every hour for testing Windows runners
-    - cron: '0 * * * *'
+    - cron: "0 * * * *"
 
   workflow_call:
     inputs:
@@ -64,12 +64,12 @@ jobs:
       fail-fast: false
       matrix:
         platform:
-          - { os: linux, runner: blacksmith-4vcpu-ubuntu-2404, target: x86_64 }
-          - {
-              os: linux,
-              runner: blacksmith-4vcpu-ubuntu-2404-arm,
-              target: aarch64,
-            }
+          # - { os: linux, runner: blacksmith-4vcpu-ubuntu-2404, target: x86_64 }
+          # - {
+          #     os: linux,
+          #     runner: blacksmith-4vcpu-ubuntu-2404-arm,
+          #     target: aarch64,
+          #   }
           - {
               os: windows,
               runner: blacksmith-staging-8vcpu-windows-2025,

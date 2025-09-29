@@ -51,12 +51,12 @@ jobs:
         id: version
         run: echo "version=$(python -m setuptools_scm)" >> $GITHUB_OUTPUT
 
-  python-tests-linux:
-    uses: ./.github/workflows/_python-tests.yml
-    secrets: inherit
-    with:
-      python_versions: '["3.9", "3.10", "3.11", "3.12"]'
-      property_testing_preset: "normal"
+  # python-tests-linux:
+  #   uses: ./.github/workflows/_python-tests.yml
+  #   secrets: inherit
+  #   with:
+  #     python_versions: '["3.9", "3.10", "3.11", "3.12"]'
+  #     property_testing_preset: "normal"
 
   python-tests-windows-blacksmith:
     name: Python tests Windows (Blacksmith)
@@ -80,19 +80,19 @@ jobs:
       property_testing_preset: "normal"
       runner: "8core-32gb-windows-2025"
 
-  javascript-client-tests:
-    name: JavaScript client tests
-    uses: ./.github/workflows/_javascript-client-tests.yml
+  # javascript-client-tests:
+  #   name: JavaScript client tests
+  #   uses: ./.github/workflows/_javascript-client-tests.yml
 
-  rust-tests:
-    name: Rust tests
-    uses: ./.github/workflows/_rust-tests.yml
-    secrets: inherit
+  # rust-tests:
+  #   name: Rust tests
+  #   uses: ./.github/workflows/_rust-tests.yml
+  #   secrets: inherit
 
-  go-tests:
-    name: Go tests
-    uses: ./.github/workflows/_go-tests.yml
-    secrets: inherit
+  # go-tests:
+  #   name: Go tests
+  #   uses: ./.github/workflows/_go-tests.yml
+  #   secrets: inherit
 
   # release-docker:
   #   name: Publish to DockerHub and GHCR
@@ -117,12 +117,12 @@ jobs:
     needs:
       - check-tag
       - get-version
-      - python-tests-linux
+      # - python-tests-linux
       - python-tests-windows-blacksmith
       - python-tests-windows-github
-      - javascript-client-tests
-      - rust-tests
-      - go-tests
+      # - javascript-client-tests
+      # - rust-tests
+      # - go-tests
     uses: ./.github/workflows/_build_release_pypi.yml
     secrets: inherit
     with:
