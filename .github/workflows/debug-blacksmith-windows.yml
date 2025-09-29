@@ -1,0 +1,208 @@
+name: Debug Blacksmith Windows Runners
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - ts/debug-failures
+
+jobs:
+  # Test 1: Basic Rust bindings build and test
+  test-rust-bindings-basic:
+    name: Test Rust Bindings Basic
+    runs-on: blacksmith-staging-4vcpu-windows-2025
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+
+      - name: Set up Python 3.12
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Setup Rust
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: x86_64-pc-windows-msvc
+
+      - name: Install dependencies
+        shell: bash
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+          pip install maturin pytest
+
+      - name: Build Rust bindings
+        shell: bash
+        run: |
+          maturin build --release
+
+      - name: Install built wheel
+        shell: bash
+        run: |
+          pip install --no-index --find-links target/wheels/ chromadb
+
+      - name: Run minimal test
+        shell: bash
+        env:
+          CHROMA_RUST_BINDINGS_TEST_ONLY: "1"
+          RUST_BACKTRACE: 1
+        run: |
+          python -c "import chromadb; print('ChromaDB imported successfully')"
+          python -m pytest chromadb/test/test_api.py::test_heartbeat -v
+
+      - name: Sleep for debugging
+        if: failure()
+        shell: bash
+        run: |
+          echo "Sleeping for 400 seconds to allow SSH debugging..."
+          echo "Runner: ${{ runner.name }}"
+          echo "Job URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+          sleep 400
+
+  # Test 2: Python CLI test
+  test-python-cli:
+    name: Test Python CLI
+    runs-on: blacksmith-staging-4vcpu-windows-2025
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+
+      - name: Set up Python 3.12
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install dependencies
+        shell: bash
+        run: |
+          python -m pip install --upgrade pip
+          pip install -e .
+
+      - name: Test CLI
+        shell: bash
+        run: |
+          chroma --help
+          chroma --version
+
+      - name: Sleep for debugging
+        if: failure()
+        shell: bash
+        run: |
+          echo "Sleeping for 400 seconds to allow SSH debugging..."
+          echo "Runner: ${{ runner.name }}"
+          echo "Job URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+          sleep 400
+
+  # Test 3: Thin client test
+  test-rust-thin-client:
+    name: Test Rust Thin Client
+    runs-on: blacksmith-staging-4vcpu-windows-2025
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+
+      - name: Set up Python 3.12
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Setup Rust
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: x86_64-pc-windows-msvc
+
+      - name: Install dependencies
+        shell: bash
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+          pip install pytest
+
+      - name: Start Chroma server
+        shell: bash
+        run: |
+          uvicorn chromadb.app:app --host 0.0.0.0 --port 8000 &
+          sleep 10
+          curl http://localhost:8000/api/v1/heartbeat || true
+
+      - name: Run thin client test
+        shell: bash
+        env:
+          CHROMA_THIN_CLIENT_TEST_ONLY: "1"
+          RUST_BACKTRACE: 1
+        run: |
+          python -m pytest chromadb/test/test_api.py::test_heartbeat -v
+
+      - name: Sleep for debugging
+        if: failure()
+        shell: bash
+        run: |
+          echo "Sleeping for 400 seconds to allow SSH debugging..."
+          echo "Runner: ${{ runner.name }}"
+          echo "Job URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+          sleep 400
+
+  # Test 4: Basic environment check
+  test-environment:
+    name: Test Environment Setup
+    runs-on: blacksmith-staging-4vcpu-windows-2025
+    steps:
+      - name: System info
+        shell: powershell
+        run: |
+          echo "OS Version:"
+          [System.Environment]::OSVersion.VersionString
+          echo ""
+          echo "Processor:"
+          Get-WmiObject Win32_Processor | Select Name, NumberOfCores, NumberOfLogicalProcessors
+          echo ""
+          echo "Memory:"
+          Get-WmiObject Win32_ComputerSystem | Select TotalPhysicalMemory
+          echo ""
+          echo "Disk:"
+          Get-PSDrive -PSProvider FileSystem
+
+      - name: Check pre-installed tools
+        shell: powershell
+        run: |
+          echo "Checking for Git:"
+          git --version
+          echo ""
+          echo "Checking for Python:"
+          python --version
+          echo ""
+          echo "Checking for Node:"
+          node --version
+          echo ""
+          echo "Checking for Chocolatey:"
+          choco --version
+          echo ""
+          echo "Checking for Visual Studio:"
+          if (Test-Path "${env:ProgramFiles}\Microsoft Visual Studio\2022") {
+            Get-ChildItem "${env:ProgramFiles}\Microsoft Visual Studio\2022"
+          }
+          if (Test-Path "${env:ProgramFiles(x86)}\Microsoft Visual Studio\2022") {
+            Get-ChildItem "${env:ProgramFiles(x86)}\Microsoft Visual Studio\2022"
+          }
+
+      - name: Check PATH
+        shell: powershell
+        run: |
+          echo "PATH entries:"
+          $env:PATH -split ';' | ForEach-Object { $_ }
+
+      - name: Sleep for debugging
+        if: failure()
+        shell: bash
+        run: |
+          echo "Sleeping for 400 seconds to allow SSH debugging..."
+          echo "Runner: ${{ runner.name }}"
+          echo "Job URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+          sleep 400

@@ -15,5 +15,4 @@ self-hosted-runner:
     - blacksmith-8vcpu-windows-2025
     - blacksmith-staging-4vcpu-windows-2025
     - blacksmith-staging-8vcpu-windows-2025
-    - bs-dev-taha
     - 8core-32gb-windows-2025
