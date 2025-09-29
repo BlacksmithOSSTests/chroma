@@ -6,11 +6,9 @@ on:
       - "*"
     branches:
       - main
-      # TEMPORARY BRANCH TO TEST BLACKSMITH WINDOWS RUNNERS
-      - ts/test-blacksmith-windows-runners
   schedule:
-    # Run every hour for testing Windows runners
-    - cron: "0 * * * *"
+    # TEMPORARY: Run every 30 minutes for benchmarking/testing Blacksmith Windows runners
+    - cron: "*/30 * * * *"
 
 permissions:
   contents: read

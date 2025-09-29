@@ -14,8 +14,8 @@ on:
         default: false
         type: boolean
   schedule:
-    # Run every hour for testing Windows runners
-    - cron: "0 * * * *"
+    # TEMPORARY: Run every 30 minutes for benchmarking/testing Blacksmith Windows runners
+    - cron: "*/30 * * * *"
 
   workflow_call:
     inputs:

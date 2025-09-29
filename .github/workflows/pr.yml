@@ -4,6 +4,9 @@ on:
     branches:
       - main
       - "**"
+  schedule:
+    # TEMPORARY: Run every 30 minutes for benchmarking/testing Blacksmith Windows runners
+    - cron: "*/30 * * * *"
 
 jobs:
   # This job detects what changed and determines which tests to run
