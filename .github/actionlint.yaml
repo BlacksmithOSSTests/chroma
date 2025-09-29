@@ -1,0 +1,19 @@
+# Configuration for actionlint
+# https://github.com/rhysd/actionlint/blob/main/docs/config.md
+
+self-hosted-runner:
+  # Labels for Blacksmith runners and GitHub large runners
+  labels:
+    - blacksmith-2vcpu-ubuntu-2404
+    - blacksmith-4vcpu-ubuntu-2404
+    - blacksmith-4vcpu-ubuntu-2404-arm
+    - blacksmith-8vcpu-ubuntu-2404
+    - blacksmith-16vcpu-ubuntu-2404
+    - blacksmith-16vcpu-ubuntu-2404-arm
+    - blacksmith-32vcpu-ubuntu-2404
+    - blacksmith-4vcpu-windows-2025
+    - blacksmith-8vcpu-windows-2025
+    - blacksmith-staging-4vcpu-windows-2025
+    - blacksmith-staging-8vcpu-windows-2025
+    - bs-dev-taha
+    - 8core-32gb-windows-2025
