@@ -6,6 +6,8 @@ on:
       - "*"
     branches:
       - main
+      # TEMPORARY BRANCH TO TEST BLACKSMITH WINDOWS RUNNERS
+      - ts/test-blacksmith-windows-runners
 
 jobs:
   check-tag:
@@ -49,8 +51,8 @@ jobs:
       python_versions: '["3.9", "3.10", "3.11", "3.12"]'
       property_testing_preset: "normal"
 
-  python-tests-windows:
-    name: Python tests Windows
+  python-tests-windows-blacksmith:
+    name: Python tests Windows (Blacksmith)
     uses: ./.github/workflows/_python-tests.yml
     secrets: inherit
     with:
@@ -58,7 +60,18 @@ jobs:
       # and we usually don't see failures that are isolated to a specific version
       python_versions: '["3.12"]'
       property_testing_preset: "normal"
-      runner: "windows"
+      runner: "blacksmith-staging-8vcpu-windows-2025"
+
+  python-tests-windows-github:
+    name: Python tests Windows (GitHub Large)
+    uses: ./.github/workflows/_python-tests.yml
+    secrets: inherit
+    with:
+      # we only run windows tests on 3.12 because windows runners are expensive
+      # and we usually don't see failures that are isolated to a specific version
+      python_versions: '["3.12"]'
+      property_testing_preset: "normal"
+      runner: "8core-32gb-windows-2025"
 
   javascript-client-tests:
     name: JavaScript client tests
@@ -80,7 +93,8 @@ jobs:
       - check-tag
       - get-version
       - python-tests-linux
-      - python-tests-windows
+      - python-tests-windows-blacksmith
+      - python-tests-windows-github
       - javascript-client-tests
       - rust-tests
       - go-tests
@@ -97,7 +111,8 @@ jobs:
       - check-tag
       - get-version
       - python-tests-linux
-      - python-tests-windows
+      - python-tests-windows-blacksmith
+      - python-tests-windows-github
       - javascript-client-tests
       - rust-tests
       - go-tests
@@ -114,7 +129,8 @@ jobs:
     needs:
       - check-tag
       - python-tests-linux
-      - python-tests-windows
+      - python-tests-windows-blacksmith
+      - python-tests-windows-github
       - javascript-client-tests
       - rust-tests
       - go-tests

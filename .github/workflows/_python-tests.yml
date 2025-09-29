@@ -265,8 +265,8 @@ jobs:
       matrix:
         python: ${{ fromJson(inputs.python_versions) }}
         runner:
-          - [blacksmith-staging-4vcpu-windows-2025, bs-dev-taha]
-          - windows-2025
+          - blacksmith-staging-8vcpu-windows-2025
+          - 8core-32gb-windows-2025
     runs-on: ${{ matrix.runner }}
     steps:
       - name: Checkout
@@ -279,32 +279,6 @@ jobs:
         uses: ./.github/actions/rust
         with:
           github-token: ${{ github.token }}
-
-      # TEMPORARY STEP TO INSTALL MSVC TOOLS
-      # BEFORE RELEASING A NEW WINDOWS RUNNER
-      # - name: Install dependencies
-      #   run: |
-      #     choco install visualstudio2022buildtools -y --no-progress
-      #     choco install visualstudio2022-workload-vctools -y --no-progress
-
-      #     Write-Host "Setting VS2022_BUILDTOOLS environment variable"
-      #     [Environment]::SetEnvironmentVariable("VS2022_BUILDTOOLS", 'C:\Program Files (x86)\Microsoft Visual Studio\2022\BuildTools', [System.EnvironmentVariableTarget]::Machine)
-
-      #     $msvcPath = Get-ChildItem -Path "C:\Program Files (x86)\Microsoft Visual Studio\2022\BuildTools\VC\Tools\MSVC" -Directory | Select-Object -First 1
-      #     Write-Output "MSVC path: $msvcPath"
-
-      #     $msvcBinPath = Join-Path $msvcPath.FullName "bin\Hostx64\x64"
-      #     Write-Host "Adding MSVC tools to PATH: $msvcBinPath"
-
-      #     $currentPath = [System.Environment]::GetEnvironmentVariable("PATH", "Machine")
-      #     Write-Host "Current PATH: $currentPath"
-
-      #     $newPath = $msvcBinPath + ';' + $currentPath
-      #     [Environment]::SetEnvironmentVariable("PATH", $newPath, "Machine")
-      #     $finalPath = [System.Environment]::GetEnvironmentVariable("PATH", "Machine")
-      #     Write-Host "New PATH: $finalPath"
-      #   shell: powershell
-
       - name: Build Rust bindings
         uses: PyO3/maturin-action@v1
         with:

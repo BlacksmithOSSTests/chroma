@@ -47,8 +47,8 @@ jobs:
       fail-fast: false
       matrix:
         runner:
-          - [blacksmith-staging-4vcpu-windows-2025, bs-dev-taha]
-          - windows-2025
+          - blacksmith-staging-8vcpu-windows-2025
+          - 8core-32gb-windows-2025
     runs-on: ${{ matrix.runner }}
     steps:
       - name: Checkout repository
@@ -76,7 +76,7 @@ jobs:
       - name: Upload Windows binary artifact
         uses: actions/upload-artifact@v4
         with:
-          name: chroma-windows
+          name: chroma-windows-${{ matrix.runner == '8core-32gb-windows-2025' && 'github' || 'blacksmith' }}
           path: chroma-windows.exe
 
   # build-macos:

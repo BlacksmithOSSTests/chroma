@@ -79,8 +79,8 @@ jobs:
       fail-fast: false
       matrix:
         runner:
-          - [blacksmith-staging-4vcpu-windows-2025, bs-dev-taha]
-          - windows-2025
+          - blacksmith-staging-8vcpu-windows-2025
+          - 8core-32gb-windows-2025
     runs-on: ${{ matrix.runner }}
     defaults:
       run:
@@ -128,7 +128,7 @@ jobs:
       - name: Upload x86_64 artifact
         uses: actions/upload-artifact@v4
         with:
-          name: bindings-x86_64-pc-windows-msvc
+          name: bindings-x86_64-pc-windows-msvc-${{ matrix.runner == '8core-32gb-windows-2025' && 'github' || 'blacksmith' }}
           path: rust/js_bindings/chromadb-js-bindings.win32-x64-msvc.node
           if-no-files-found: error
 
