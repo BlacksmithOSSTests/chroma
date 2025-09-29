@@ -9,6 +9,9 @@ on:
   push:
     tags:
       - "cli_release_[0-9]*.[0-9]*.[0-9]*"
+  schedule:
+    # Run every hour for testing Windows runners
+    - cron: '0 * * * *'
 
 jobs:
   # build-linux:

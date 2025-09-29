@@ -13,10 +13,9 @@ on:
         required: false
         default: false
         type: boolean
-      version:
-        description: "Version to publish"
-        required: false
-        type: string
+  schedule:
+    # Run every hour for testing Windows runners
+    - cron: '0 * * * *'
 
   workflow_call:
     inputs:
