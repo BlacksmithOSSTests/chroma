@@ -10,7 +10,9 @@ jobs:
   # Test 1: Basic Rust bindings build and test
   test-rust-bindings-basic:
     name: Test Rust Bindings Basic
-    runs-on: blacksmith-staging-4vcpu-windows-2025
+    runs-on:
+      - blacksmith-staging-4vcpu-windows-2025
+      - bs-dev-taha
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -56,7 +58,9 @@ jobs:
   # Test 2: Python CLI test
   test-python-cli:
     name: Test Python CLI
-    runs-on: blacksmith-staging-4vcpu-windows-2025
+    runs-on:
+      - blacksmith-staging-4vcpu-windows-2025
+      - bs-dev-taha
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -98,7 +102,9 @@ jobs:
   # Test 3: Thin client test
   test-rust-thin-client:
     name: Test Rust Thin Client
-    runs-on: blacksmith-staging-4vcpu-windows-2025
+    runs-on:
+      - blacksmith-staging-4vcpu-windows-2025
+      - bs-dev-taha
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -133,7 +139,9 @@ jobs:
   # Test 4: Basic environment check
   test-environment:
     name: Test Environment Setup
-    runs-on: blacksmith-staging-4vcpu-windows-2025
+    runs-on:
+      - blacksmith-staging-4vcpu-windows-2025
+      - bs-dev-taha
     steps:
       - name: System info
         shell: powershell
