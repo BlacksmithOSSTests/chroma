@@ -264,15 +264,11 @@ jobs:
     # also only run the smoke tests on PRs (ie not main and not tags) since
     # we are already running the full suite on Windows in those cases
     if: ${{ !contains(inputs.runner, 'windows') && github.ref != 'refs/heads/main' && !startsWith(github.ref, 'refs/tags/') }}
-    name: Windows Smoke Test (${{ matrix.runner }} - Python ${{ matrix.python }})
     strategy:
       fail-fast: false
       matrix:
         python: ${{ fromJson(inputs.python_versions) }}
-        runner:
-          - blacksmith-staging-8vcpu-windows-2025
-          - 8core-32gb-windows-2025
-    runs-on: ${{ matrix.runner }}
+    runs-on: blacksmith-staging-8vcpu-windows-2025
     steps:
       - name: Checkout
         uses: actions/checkout@v4

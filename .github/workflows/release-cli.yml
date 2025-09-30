@@ -45,14 +45,8 @@ jobs:
   #         path: chroma-linux
 
   build-windows:
-    name: Build Windows binary (${{ matrix.runner }})
-    strategy:
-      fail-fast: false
-      matrix:
-        runner:
-          - blacksmith-staging-8vcpu-windows-2025
-          - 8core-32gb-windows-2025
-    runs-on: ${{ matrix.runner }}
+    name: Build Windows binary
+    runs-on: blacksmith-staging-8vcpu-windows-2025
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
@@ -79,7 +73,7 @@ jobs:
       - name: Upload Windows binary artifact
         uses: actions/upload-artifact@v4
         with:
-          name: chroma-windows-${{ matrix.runner == '8core-32gb-windows-2025' && 'github' || 'blacksmith' }}
+          name: chroma-windows
           path: chroma-windows.exe
 
   # build-macos:
