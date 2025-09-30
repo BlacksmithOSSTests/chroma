@@ -12,6 +12,7 @@ runs:
       uses: astral-sh/setup-uv@v6
       with:
         enable-cache: true
+        cache-local-path: C:\runner\cache\uv
     - name: Set up Python 3.9 for protos
       uses: actions/setup-python@v5
       with:
