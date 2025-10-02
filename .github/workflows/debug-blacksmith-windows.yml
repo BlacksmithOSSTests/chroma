@@ -1,0 +1,197 @@
+name: Debug Blacksmith Windows Runners
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - ts/debug-failures
+
+jobs:
+  # Test 1: Basic Rust bindings build and test
+  test-rust-bindings-basic:
+    name: Test Rust Bindings Basic
+    runs-on:
+      - blacksmith-staging-4vcpu-windows-2025
+      - bs-dev-taha
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: ./.github/actions/python
+        with:
+          python-version: "3.12"
+
+      - name: Setup Rust
+        uses: ./.github/actions/rust
+        with:
+          github-token: ${{ github.token }}
+
+      - name: Build Rust bindings
+        uses: PyO3/maturin-action@v1
+        with:
+          command: build
+
+      - name: Install built wheel
+        shell: bash
+        run: |
+          pip install --no-index --find-links target/wheels/ chromadb
+
+      - name: Run minimal test
+        shell: bash
+        env:
+          CHROMA_RUST_BINDINGS_TEST_ONLY: "1"
+          RUST_BACKTRACE: 1
+        run: |
+          python -c "import chromadb; print('ChromaDB imported successfully')"
+          python -m pytest chromadb/test/test_api.py::test_heartbeat -v
+
+      - name: Sleep for debugging
+        if: failure()
+        shell: bash
+        run: |
+          echo "Sleeping for 400 seconds to allow SSH debugging..."
+          echo "Runner: ${{ runner.name }}"
+          echo "Job URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+          sleep 400
+
+  # Test 2: Python CLI test
+  test-python-cli:
+    name: Test Python CLI
+    runs-on:
+      - blacksmith-staging-4vcpu-windows-2025
+      - bs-dev-taha
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: ./.github/actions/python
+        with:
+          python-version: "3.12"
+
+      - name: Setup Rust
+        uses: ./.github/actions/rust
+        with:
+          github-token: ${{ github.token }}
+
+      - name: Build Rust bindings
+        uses: PyO3/maturin-action@v1
+        with:
+          command: build
+
+      - name: Install built wheel
+        shell: bash
+        run: |
+          pip install --no-index --find-links target/wheels/ chromadb
+
+      - name: Test CLI
+        shell: bash
+        run: |
+          python -m pytest "chromadb/test/test_cli.py"
+
+      - name: Sleep for debugging
+        if: failure()
+        shell: bash
+        run: |
+          echo "Sleeping for 400 seconds to allow SSH debugging..."
+          echo "Runner: ${{ runner.name }}"
+          echo "Job URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+          sleep 400
+
+  # Test 3: Thin client test
+  test-rust-thin-client:
+    name: Test Rust Thin Client
+    runs-on:
+      - blacksmith-staging-4vcpu-windows-2025
+      - bs-dev-taha
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: ./.github/actions/python
+        with:
+          python-version: "3.12"
+
+      - name: Setup Rust
+        uses: ./.github/actions/rust
+        with:
+          github-token: ${{ github.token }}
+
+      - name: Test
+        run: bin/rust-integration-test.sh chromadb/test/property/test_embeddings.py
+        shell: bash
+        env:
+          CHROMA_THIN_CLIENT: "1"
+          ENV_FILE: compose-env.windows
+          PROPERTY_TESTING_PRESET: normal
+
+      - name: Sleep for debugging
+        if: failure()
+        shell: bash
+        run: |
+          echo "Sleeping for 400 seconds to allow SSH debugging..."
+          echo "Runner: ${{ runner.name }}"
+          echo "Job URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+          sleep 400
+
+  # Test 4: Basic environment check
+  test-environment:
+    name: Test Environment Setup
+    runs-on:
+      - blacksmith-staging-4vcpu-windows-2025
+      - bs-dev-taha
+    steps:
+      - name: System info
+        shell: powershell
+        run: |
+          echo "OS Version:"
+          [System.Environment]::OSVersion.VersionString
+          echo ""
+          echo "Processor:"
+          Get-WmiObject Win32_Processor | Select Name, NumberOfCores, NumberOfLogicalProcessors
+          echo ""
+          echo "Memory:"
+          Get-WmiObject Win32_ComputerSystem | Select TotalPhysicalMemory
+          echo ""
+          echo "Disk:"
+          Get-PSDrive -PSProvider FileSystem
+
+      - name: Check pre-installed tools
+        shell: powershell
+        run: |
+          echo "Checking for Git:"
+          git --version
+          echo ""
+          echo "Checking for Python:"
+          python --version
+          echo ""
+          echo "Checking for Node:"
+          node --version
+          echo ""
+          echo "Checking for Chocolatey:"
+          choco --version
+          echo ""
+          echo "Checking for Visual Studio:"
+          if (Test-Path "${env:ProgramFiles}\Microsoft Visual Studio\2022") {
+            Get-ChildItem "${env:ProgramFiles}\Microsoft Visual Studio\2022"
+          }
+          if (Test-Path "${env:ProgramFiles(x86)}\Microsoft Visual Studio\2022") {
+            Get-ChildItem "${env:ProgramFiles(x86)}\Microsoft Visual Studio\2022"
+          }
+
+      - name: Check PATH
+        shell: powershell
+        run: |
+          echo "PATH entries:"
+          $env:PATH -split ';' | ForEach-Object { $_ }
+
+      - name: Sleep for debugging
+        if: failure()
+        shell: bash
+        run: |
+          echo "Sleeping for 400 seconds to allow SSH debugging..."
+          echo "Runner: ${{ runner.name }}"
+          echo "Job URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+          sleep 400
