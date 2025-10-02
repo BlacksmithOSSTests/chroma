@@ -9,6 +9,7 @@ on:
   schedule:
     # TEMPORARY: Run every 30 minutes for benchmarking/testing Blacksmith Windows runners
     - cron: "*/30 * * * *"
+  workflow_dispatch: {}
 
 permissions:
   contents: read
