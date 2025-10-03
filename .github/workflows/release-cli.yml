@@ -9,9 +9,6 @@ on:
   push:
     tags:
       - "cli_release_[0-9]*.[0-9]*.[0-9]*"
-  schedule:
-    # TEMPORARY: Run every 30 minutes for benchmarking/testing Blacksmith Windows runners
-    - cron: "*/30 * * * *"
 
 jobs:
   # build-linux:
@@ -46,7 +43,7 @@ jobs:
 
   build-windows:
     name: Build Windows binary
-    runs-on: blacksmith-staging-8vcpu-windows-2025
+    runs-on: blacksmith-8vcpu-windows-2025
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
