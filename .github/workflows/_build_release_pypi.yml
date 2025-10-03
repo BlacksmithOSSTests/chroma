@@ -13,9 +13,6 @@ on:
         required: false
         default: false
         type: boolean
-  schedule:
-    # TEMPORARY: Run every 30 minutes for benchmarking/testing Blacksmith Windows runners
-    - cron: "*/30 * * * *"
 
   workflow_call:
     inputs:
@@ -70,11 +67,7 @@ jobs:
           #     runner: blacksmith-4vcpu-ubuntu-2404-arm,
           #     target: aarch64,
           #   }
-          - {
-              os: windows,
-              runner: blacksmith-staging-8vcpu-windows-2025,
-              target: x64,
-            }
+          - { os: windows, runner: blacksmith-8vcpu-windows-2025, target: x64 }
           # - { os: macos, runner: macos-14, target: x86_64 }
           # - { os: macos, runner: macos-14, target: aarch64 }
 

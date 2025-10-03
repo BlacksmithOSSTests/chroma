@@ -7,8 +7,8 @@ on:
     branches:
       - main
   schedule:
-    # TEMPORARY: Run every 30 minutes for benchmarking/testing Blacksmith Windows runners
-    - cron: "*/30 * * * *"
+    # TEMPORARY: Run once an hour at the 0th minute to test Blacksmith Windows runners
+    - cron: "0 * * * *"
   workflow_dispatch: {}
 
 permissions:
@@ -24,7 +24,7 @@ jobs:
       - name: Check Tag
         id: check-tag
         run: |
-          if [[ ${{ github.event.ref }} =~ ^refs/tags/[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+          if [[ "${{ github.ref }}" =~ ^refs/tags/[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
               echo "tag_matches=true" >> $GITHUB_OUTPUT
           else
             echo "Tag does not match the release tag pattern ([0-9]+\.[0-9]+\.[0-9]+), exiting workflow"
@@ -66,7 +66,7 @@ jobs:
       # and we usually don't see failures that are isolated to a specific version
       python_versions: '["3.12"]'
       property_testing_preset: "normal"
-      runner: "blacksmith-staging-8vcpu-windows-2025"
+      runner: "blacksmith-8vcpu-windows-2025"
 
   # javascript-client-tests:
   #   name: JavaScript client tests

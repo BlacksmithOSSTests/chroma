@@ -8,9 +8,6 @@ permissions:
   id-token: write
 "on":
   workflow_dispatch: {}
-  schedule:
-    # TEMPORARY: Run every 30 minutes for benchmarking/testing Blacksmith Windows runners
-    - cron: '*/30 * * * *'
   workflow_call: {}
 jobs:
   # build-macos:
@@ -78,7 +75,7 @@ jobs:
 
   build-windows:
     name: Build Windows bindings
-    runs-on: blacksmith-staging-8vcpu-windows-2025
+    runs-on: blacksmith-8vcpu-windows-2025
     defaults:
       run:
         working-directory: rust/js_bindings
