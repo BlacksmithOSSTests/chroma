@@ -1,20 +1,23 @@
 name: Run (intensive) tests nightly
 on:
   workflow_dispatch:
-  schedule:
-      # 2:15 AM PDT, offseted by a few minutes because:
-      # "The schedule event can be delayed during periods of high loads of GitHub Actions workflow runs. High load times include the start of every hour. If the load is sufficiently high enough, some queued jobs may be dropped."
-      - cron: '15 9 * * *'
+  # schedule:
+  #     # 2:15 AM PDT, offseted by a few minutes because:
+  #     # "The schedule event can be delayed during periods of high loads of GitHub Actions workflow runs. High load times include the start of every hour. If the load is sufficiently high enough, some queued jobs may be dropped."
+  #     - cron: '15 9 * * *'
 
 jobs:
   test-cluster:
     strategy:
       fail-fast: false
       matrix:
-        test-globs: ["chromadb/test/property/test_collections.py",
-                   "chromadb/test/property/test_add.py",
-                   "chromadb/test/property/test_filtering.py",
-                   "chromadb/test/property/test_embeddings.py"]
+        test-globs:
+          [
+            "chromadb/test/property/test_collections.py",
+            "chromadb/test/property/test_add.py",
+            "chromadb/test/property/test_filtering.py",
+            "chromadb/test/property/test_embeddings.py",
+          ]
     runs-on: "blacksmith-8vcpu-ubuntu-2404"
     steps:
       - uses: actions/checkout@v4
@@ -44,7 +47,7 @@ jobs:
         if: ${{ failure() }}
         uses: Entle/action-pagerduty-alert@0.2.0
         with:
-          pagerduty-integration-key: '${{ secrets.PAGERDUTY_INTEGRATION_KEY }}'
+          pagerduty-integration-key: "${{ secrets.PAGERDUTY_INTEGRATION_KEY }}"
           pagerduty-dedup-key: distributed-test-failed-${{ matrix.test-globs}}
 
   merge-cluster-logs:
