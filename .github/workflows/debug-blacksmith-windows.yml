@@ -2,9 +2,6 @@ name: Debug Blacksmith Windows Runners
 
 on:
   workflow_dispatch:
-  push:
-    branches:
-      - ts/debug-failures
 
 jobs:
   # Test 1: Basic Rust bindings build and test
@@ -50,10 +47,10 @@ jobs:
         if: failure()
         shell: bash
         run: |
-          echo "Sleeping for 400 seconds to allow SSH debugging..."
+          echo "Sleeping for 15 minutes (900 seconds) to allow SSH debugging..."
           echo "Runner: ${{ runner.name }}"
           echo "Job URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
-          sleep 400
+          sleep 900
 
   # Test 2: Python CLI test
   test-python-cli:
