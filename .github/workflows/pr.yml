@@ -4,6 +4,9 @@ on:
     branches:
       - main
       - '**'
+  push:
+    branches:
+      - pb/minikube-repro
 
 # Cancel any in-progress workflows when a new commit is pushed to the PR.
 concurrency:
