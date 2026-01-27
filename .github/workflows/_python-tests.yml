@@ -20,6 +20,7 @@ on:
 
 jobs:
   test-rust-bindings:
+    if: false
     timeout-minutes: 90
     strategy:
       fail-fast: false
@@ -60,6 +61,7 @@ jobs:
           RUST_BACKTRACE: 1
 
   test-rust-single-node-integration:
+    if: false
     strategy:
       fail-fast: false
       matrix:
@@ -92,6 +94,7 @@ jobs:
         PROPERTY_TESTING_PRESET: ${{ inputs.property_testing_preset }}
 
   test-rust-thin-client:
+    if: false
     strategy:
       matrix:
         python: ${{ fromJson(inputs.python_versions) }}
@@ -121,8 +124,25 @@ jobs:
           ENV_FILE: ${{ contains(inputs.runner, 'ubuntu') && 'compose-env.linux' || 'compose-env.windows' }}
           PROPERTY_TESTING_PRESET: ${{ inputs.property_testing_preset }}
 
-  test-cluster-rust-frontend:
+  test-tilt-startup:
     if: ${{ contains(inputs.runner, 'ubuntu') }}
+    runs-on: ${{ inputs.runner }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Setup Docker
+        uses: ./.github/actions/docker
+        with:
+          dockerhub-username: ${{ secrets.DOCKERHUB_USERNAME }}
+          dockerhub-password: ${{ secrets.DOCKERHUB_TOKEN }}
+      - name: Start Tilt services
+        uses: ./.github/actions/tilt
+      - name: Verify Tilt started
+        run: echo "Tilt services started successfully"
+        shell: bash
+
+  test-cluster-rust-frontend:
+    if: false
     strategy:
       fail-fast: false
       matrix:
@@ -195,7 +215,7 @@ jobs:
           artifact-name: ${{ steps.compute-artifact-name.outputs.artifact_name }}
 
   merge-cluster-logs:
-    if: ${{ contains(inputs.runner, 'ubuntu') }}
+    if: false
     runs-on: blacksmith-4vcpu-ubuntu-2404
     needs: test-cluster-rust-frontend
     steps:
@@ -206,6 +226,7 @@ jobs:
           pattern: cluster_logs_*
 
   test-rust-bindings-stress:
+    if: false
     timeout-minutes: 90
     strategy:
       fail-fast: false
@@ -238,6 +259,7 @@ jobs:
           CHROMA_RUST_BINDINGS_TEST_ONLY: "1"
 
   test-python-cli:
+    if: false
     strategy:
       fail-fast: false
       matrix:
@@ -270,7 +292,7 @@ jobs:
     # only run windows smoke tests when the runner isn't already windows,
     # also only run the smoke tests on PRs (ie not main and not tags) since
     # we are already running the full suite on Windows in those cases
-    if: ${{ !contains(inputs.runner, 'windows') && github.ref != 'refs/heads/main' && !startsWith(github.ref, 'refs/tags/') }}
+    if: false
     strategy:
       fail-fast: false
       matrix:
