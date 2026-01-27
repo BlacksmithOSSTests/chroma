@@ -177,10 +177,6 @@ jobs:
           - test-glob: "chromadb/test/property/test_collections_with_database_tenant_overwrite.py"
             multi_region: true
     runs-on: ${{ inputs.runner }}
-    # OIDC token auth for AWS
-    permissions:
-      contents: read
-      id-token: write
     env:
       MULTI_REGION: ${{ matrix.multi_region && 'true' || '' }}
     steps:
