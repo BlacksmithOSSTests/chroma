@@ -130,6 +130,13 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+      - name: Clear DNS cache
+        run: |
+          echo "Clearing DNS cache to avoid flakiness"
+          sudo resolvectl flush-caches || true
+          sudo systemctl restart systemd-resolved || true
+          echo "DNS cache cleared"
+        shell: bash
       - name: Setup Docker
         uses: ./.github/actions/docker
         with:
@@ -139,12 +146,6 @@ jobs:
         uses: ./.github/actions/tilt
       - name: Verify Tilt started
         run: echo "Tilt services started successfully"
-        shell: bash
-      - name: Sleep for debugging
-        run: |
-          echo "Sleeping for 2 hours to allow SSH debugging..."
-          echo "Connect via SSH to investigate the environment"
-          sleep 7200
         shell: bash
 
   test-cluster-rust-frontend:
