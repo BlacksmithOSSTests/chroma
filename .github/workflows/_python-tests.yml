@@ -156,7 +156,7 @@ jobs:
             multi_region: true
           - test-glob: "chromadb/test/property/test_collections_with_database_tenant_overwrite.py"
             multi_region: true
-    runs-on: blacksmith-8vcpu-ubuntu-2404
+    runs-on: ${{ inputs.runner }}
     # OIDC token auth for AWS
     permissions:
       contents: read
