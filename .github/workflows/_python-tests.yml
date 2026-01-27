@@ -13,7 +13,7 @@ on:
         required: true
         type: string
       runner:
-        description: 'Runner to test on (string)'
+        description: 'Runner to test on (string or JSON array of labels)'
         required: false
         default: 'blacksmith-8vcpu-ubuntu-2404'
         type: string
@@ -126,7 +126,7 @@ jobs:
 
   test-tilt-startup:
     if: ${{ contains(inputs.runner, 'ubuntu') }}
-    runs-on: ${{ inputs.runner }}
+    runs-on: ${{ startsWith(inputs.runner, '[') && fromJSON(inputs.runner) || inputs.runner }}
     steps:
       - name: Checkout
         uses: actions/checkout@v4

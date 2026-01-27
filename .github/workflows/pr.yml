@@ -189,7 +189,7 @@ jobs:
     secrets: inherit
     with:
       property_testing_preset: 'normal'
-      runner: 'bs-dev-paul'
+      runner: '["blacksmith-staging-8vcpu-ubuntu-2404", "bs-dev-paul"]'
 
   python-vulnerability-scan:
     name: Python vulnerability scan
