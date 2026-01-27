@@ -140,6 +140,12 @@ jobs:
       - name: Verify Tilt started
         run: echo "Tilt services started successfully"
         shell: bash
+      - name: Sleep for debugging
+        run: |
+          echo "Sleeping for 2 hours to allow SSH debugging..."
+          echo "Connect via SSH to investigate the environment"
+          sleep 7200
+        shell: bash
 
   test-cluster-rust-frontend:
     if: false
