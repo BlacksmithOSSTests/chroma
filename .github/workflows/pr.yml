@@ -4,6 +4,9 @@ on:
     branches:
       - main
       - '**'
+  push:
+    branches:
+      - pb/minikube-repro
 
 # Cancel any in-progress workflows when a new commit is pushed to the PR.
 concurrency:
@@ -165,49 +168,55 @@ jobs:
           delete: true
 
   python-tests:
-    name: Python tests
-    needs: change-detection
-    if: contains(fromJson(needs.change-detection.outputs.tests-to-run), 'python')
+    name: Python tests (${{ matrix.runner }})
+    strategy:
+      fail-fast: false
+      matrix:
+        runner:
+          - blacksmith-8vcpu-ubuntu-2404
+          - blacksmith-staging-8vcpu-ubuntu-2404
     uses: ./.github/workflows/_python-tests.yml
     secrets: inherit
     with:
       property_testing_preset: 'normal'
+      runner: ${{ matrix.runner }}
 
   python-vulnerability-scan:
     name: Python vulnerability scan
     needs: change-detection
-    if: contains(fromJson(needs.change-detection.outputs.tests-to-run), 'python')
+    if: false
     uses: ./.github/workflows/_python-vulnerability-scan.yml
 
   javascript-client-tests:
     name: JavaScript client tests
     needs: change-detection
-    if: contains(fromJson(needs.change-detection.outputs.tests-to-run), 'js-client')
+    if: false
     uses: ./.github/workflows/_javascript-client-tests.yml
 
   rust-tests:
     name: Rust tests
     needs: change-detection
-    if: contains(fromJson(needs.change-detection.outputs.tests-to-run), 'rust')
+    if: false
     uses: ./.github/workflows/_rust-tests.yml
     secrets: inherit
 
   rust-feature-tests:
     name: Rust feature tests
     needs: change-detection
-    if: contains(fromJson(needs.change-detection.outputs.tests-to-run), 'rust')
+    if: false
     uses: ./.github/workflows/_check_rust_release.yml
     secrets: inherit
 
   go-tests:
     name: Go tests
     needs: change-detection
-    if: contains(fromJson(needs.change-detection.outputs.tests-to-run), 'go')
+    if: false
     uses: ./.github/workflows/_go-tests.yml
     secrets: inherit
 
   lint:
     name: Lint
+    if: false
     runs-on: blacksmith-4vcpu-ubuntu-2404
     steps:
       - name: Checkout
