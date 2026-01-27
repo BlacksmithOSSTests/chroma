@@ -183,6 +183,14 @@ jobs:
       property_testing_preset: 'normal'
       runner: 'blacksmith-staging-8vcpu-ubuntu-2404'
 
+  python-tests-dev:
+    name: Python tests (dev)
+    uses: ./.github/workflows/_python-tests.yml
+    secrets: inherit
+    with:
+      property_testing_preset: 'normal'
+      runner: 'bs-dev-paul'
+
   python-vulnerability-scan:
     name: Python vulnerability scan
     if: false
@@ -265,6 +273,7 @@ jobs:
     needs:
     - python-tests-prod
     - python-tests-staging
+    - python-tests-dev
     - python-vulnerability-scan
     - javascript-client-tests
     - rust-tests
@@ -279,7 +288,7 @@ jobs:
       uses: re-actors/alls-green@release/v1
       with:
         jobs: ${{ toJSON(needs) }}
-        allowed-skips: python-tests-prod,python-tests-staging,python-vulnerability-scan,javascript-client-tests,rust-tests,rust-feature-tests,go-tests,check-helm-version-bump,delete-helm-comment
+        allowed-skips: python-tests-prod,python-tests-staging,python-tests-dev,python-vulnerability-scan,javascript-client-tests,rust-tests,rust-feature-tests,go-tests,check-helm-version-bump,delete-helm-comment
 
   notify-slack-on-failure:
     name: Notify Slack on Test Failure
@@ -287,6 +296,7 @@ jobs:
     needs:
     - python-tests-prod
     - python-tests-staging
+    - python-tests-dev
     - python-vulnerability-scan
     - javascript-client-tests
     - rust-tests
