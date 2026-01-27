@@ -185,36 +185,38 @@ jobs:
 
   python-vulnerability-scan:
     name: Python vulnerability scan
-    needs: change-detection
     if: false
-    uses: ./.github/workflows/_python-vulnerability-scan.yml
+    runs-on: blacksmith-4vcpu-ubuntu-2404
+    steps:
+      - run: echo "Skipped"
 
   javascript-client-tests:
     name: JavaScript client tests
-    needs: change-detection
     if: false
-    uses: ./.github/workflows/_javascript-client-tests.yml
+    runs-on: blacksmith-4vcpu-ubuntu-2404
+    steps:
+      - run: echo "Skipped"
 
   rust-tests:
     name: Rust tests
-    needs: change-detection
     if: false
-    uses: ./.github/workflows/_rust-tests.yml
-    secrets: inherit
+    runs-on: blacksmith-4vcpu-ubuntu-2404
+    steps:
+      - run: echo "Skipped"
 
   rust-feature-tests:
     name: Rust feature tests
-    needs: change-detection
     if: false
-    uses: ./.github/workflows/_check_rust_release.yml
-    secrets: inherit
+    runs-on: blacksmith-4vcpu-ubuntu-2404
+    steps:
+      - run: echo "Skipped"
 
   go-tests:
     name: Go tests
-    needs: change-detection
     if: false
-    uses: ./.github/workflows/_go-tests.yml
-    secrets: inherit
+    runs-on: blacksmith-4vcpu-ubuntu-2404
+    steps:
+      - run: echo "Skipped"
 
   lint:
     name: Lint
